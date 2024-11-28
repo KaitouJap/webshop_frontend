@@ -25,18 +25,17 @@ const ProductPage = () => {
       }
     };
     fetchData();
-  }, [products]);
+  }, []);
 
   const handleBuyProduct = async (id: number) => {
     try {
       await apiRequest(baseUrl+`/${id}/buy`, {
         method: 'PATCH',
       });
-      const updatedProducts = await apiRequest(baseUrl,{
-        method: 'GET',
-    });
+      const updatedProducts = await apiRequest(baseUrl,{ method: 'GET', });
       setProducts(updatedProducts);
     } catch (err) {
+      console.log(err)
       console.error('Failed to buy product');
     }
   };
@@ -45,19 +44,21 @@ const ProductPage = () => {
     <div>
     <NavBar/>
       <h2>Product List</h2>
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            <div>{product.name}</div>
-            <div>{product.price}</div>
-            <div>{product.count}</div>
-            <div>{productTypes.find((type) => (type.id === product.productType))?.name}</div>
-            <button onClick={() => handleBuyProduct(product.id)} disabled={product.count <= 0}>
-              Buy
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className='container'>
+        <ul className='product-list'>
+          {products.map((product) => (
+            <li className='product-item' key={product.id}>
+              <h3>{product.name}</h3>
+              <p>Price: {product.price} Ft</p>
+              <p>Left: {product.count}</p>
+              <p>Type: {productTypes.find((type) => (type.id === product.productTypeId))?.name}</p>
+              <button onClick={() => handleBuyProduct(product.id)} disabled={product.count <= 0}>
+                Buy
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

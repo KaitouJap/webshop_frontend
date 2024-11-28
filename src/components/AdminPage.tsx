@@ -1,19 +1,18 @@
 // src/components/AdminPage.tsx
 import React, { useState, useEffect } from 'react';
-import { baseUrl, apiRequest, authUrl} from '../services/api';
+import { baseUrl, apiRequest} from '../services/api';
 import { Product, ProductType } from '../types/Product';
-import { Outlet } from 'react-router-dom';
 import NavBar from './NavbarComponent';
 import { useAuth } from '../AuthContext';
 
 const AdminPage = () => {
   const [productTypeNames, setProductTypeNames] = useState<ProductType[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState(0);
-  const [productType, setProductType] = useState(1);
-  const [count, setCount] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState<string>('');
+  const [price, setPrice] = useState<number>(0);
+  const [productTypeId, setProductTypeId] = useState<number>(0);
+  const [count, setCount] = useState<number>(0);
+  const [error, setError] = useState<string>('');
   const { authToken } = useAuth();
 
   useEffect(() => {
@@ -40,14 +39,11 @@ const AdminPage = () => {
     try {
       await apiRequest(baseUrl,{
         method: 'POST',
-        headers: {
-            Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ name, price, productType, count }),
-      });
+        body: JSON.stringify({ name, price, productTypeId, count }),
+      },authToken!);
       setName('');
       setPrice(0);
-      setProductType(1);
+      setProductTypeId(1);
       setCount(0);
       // Refresh product list
       const updatedProducts = await apiRequest(baseUrl,{
@@ -55,7 +51,8 @@ const AdminPage = () => {
       });
       setProducts(updatedProducts);
     } catch (err) {
-      setError('Failed to create product');
+      if(err instanceof Error)
+        setError(err.message);
     }
   };
 
@@ -63,18 +60,16 @@ const AdminPage = () => {
     try {
         await apiRequest(baseUrl+`/${id}`,{
             method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ name, price, productType, count }),
-        });
+            body: JSON.stringify({ name, price, productTypeId, count }),
+        },authToken!);
       // Refresh product list after update
       const updatedProducts = await apiRequest(baseUrl,{
         method: 'GET',
       });
       setProducts(updatedProducts);
     } catch (err) {
-      setError('Failed to update product');
+      if(err instanceof Error)
+        setError(err.message);
     }
   };
 
@@ -82,16 +77,14 @@ const AdminPage = () => {
     try{
         await apiRequest(baseUrl+`/${id}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        });
+        },authToken!);
         const updatedProducts = await apiRequest(baseUrl,{
             method: 'GET',
         });
         setProducts(updatedProducts);
     }catch(err){
-        setError('Failed to delete product');
+      if(err instanceof Error)
+        setError(err.message);
     }
   };
 
@@ -99,7 +92,7 @@ const AdminPage = () => {
     <div>
         <NavBar/>
       <h2>Admin Product Management</h2>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {error && <div className='error'>{error}</div>}
 
       <form onSubmit={handleCreateProduct}>
         <div>
@@ -116,7 +109,7 @@ const AdminPage = () => {
         </div>
         <div>
           <label>Product Type: </label>
-          <select value={productType} onChange={(e) => setProductType(parseInt(e.target.value))}>
+          <select value={productTypeId} onChange={(e) => setProductTypeId(parseInt(e.target.value))}>
             <option value='' disabled>
                 Select Product Type
             </option>
@@ -138,19 +131,21 @@ const AdminPage = () => {
         <button type="submit">Create Product</button>
       </form>
 
-      <h3>Existing Products</h3>
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            <div>{product.name}</div>
-            <div>{product.price}</div>
-            <div>{product.count}</div>
-            <button onClick={() => handleUpdateProduct(product.id)}>Update</button>
-            <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-      <Outlet/>
+      <div className='container'>
+        <h3>Existing Products</h3>
+          <ul className='admin-product-list'>
+            {products.map((product) => (
+              <li className='admin-product-item' key={product.id}>
+                <h3>{product.name}</h3>
+                <p>Price: {product.price}</p>
+                <p>Left: {product.count}</p>
+                <p>Type: {productTypeNames.find((type) => (type.id === product.productTypeId))?.name}</p>
+                <button onClick={() => handleUpdateProduct(product.id)}>Update</button>
+                <button className='delete-btn' onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
+      </div>
     </div>
   );
 };

@@ -60,12 +60,13 @@ body {
     max-width: 400px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: #c2c1c1;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
   }
   
-  form input {
+  form input,select {
     margin-bottom: 15px;
     padding: 10px;
     font-size: 16px;
@@ -100,6 +101,7 @@ body {
   
   /* Product and Admin Pages */
   .product-list, .admin-product-list {
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -107,46 +109,43 @@ body {
   }
   
   .product-item, .admin-product-item {
-    background-color: white;
+    background-color: rgb(119, 119, 119);
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     width: 250px;
     text-align: center;
-    cursor: pointer;
-  }
-  
-  .product-item:hover, .admin-product-item:hover {
-    background-color: #f0f0f0;
   }
   
   .product-item h3, .admin-product-item h3 {
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color:  rgb(145, 142, 142);
     font-size: 18px;
     color: #333;
   }
   
   .product-item p, .admin-product-item p {
-    color: #777;
+    color: #000000;
     font-size: 14px;
   }
   
   /* Admin Page specific styles */
-  .admin-product-list {
-    flex-wrap: wrap;
-  }
   
-  .admin-product-item button {
+  .admin-product-item button, .product-item button {
     margin-top: 10px;
     padding: 8px;
-    background-color: #ffa500;
-    color: white;
+    background-color: #78cc6d;
+    font-size: 24px;
+    color: rgb(0, 0, 0);
     border: none;
     border-radius: 5px;
     cursor: pointer;
   }
   
-  .admin-product-item button:hover {
-    background-color: #e68900;
+  .admin-product-item button:hover, .product-item button:hover {
+    background-color: #5c9e54;
   }
   
   .admin-product-item .delete-btn {
